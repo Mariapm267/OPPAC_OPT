@@ -1,3 +1,27 @@
+
+
+class NeuralNetwork(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.flatten = nn.Flatten()
+        self.linear_relu_stack = nn.Sequential(
+            nn.Linear(14, 512),
+            nn.ReLU(),
+            nn.Linear(512, 128),
+            nn.ReLU(),
+            nn.Linear(128,64),
+            nn.ReLU(),
+            nn.Linear(64,8),
+            nn.ReLU(),
+            nn.Linear(8, 1)
+        )
+
+
+    def forward(self, x):
+        # Pass data through conv1
+        x = self.linear_relu_stack(x)
+        return x
+
 def train_loop(dataloader, model, loss_fn, optimizer, scheduler):
     size = len(dataloader.dataset)
     losses=[]
@@ -47,5 +71,34 @@ def test_loop(dataloader, model, loss_fn):
     #test_loss /= num_batches
     #correct /= size
     print(f"Test Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
+
+
+epochs=50
+learningRate = 0.01
+#loss_fn = torch.nn.MSELoss()
+
+model = NeuralNetwork()
+
+
+
+optimizer = torch.optim.SGD(model.parameters(), lr=learningRate)
+scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.9)
+epochs = 30
+
+train_losses=[]
+test_losses=[]
+for t in range(epochs):
+    print(f"Epoch {t+1}\n-------------------------------")
+    train_loss=train_loop(train_dataloader, model, loss_fn, optimizer, scheduler)
+    test_loss=test_loop(test_dataloader, model, loss_fn)
+    train_losses.append(train_loss)
+    test_losses.append(test_loss)
+    print("Avg train loss", train_loss, ", Avg test loss", test_loss, "Current learning rate", scheduler.get_last_lr())
+print("Done!")
+
+
+plt.plot(train_losses, label="Average training loss")
+plt.plot(test_losses, label="Average test loss")
+plt.legend(loc="best")
 
     
