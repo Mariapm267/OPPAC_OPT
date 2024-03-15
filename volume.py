@@ -16,8 +16,8 @@ DEVICE = torch.device("cuda") if torch.cuda.is_available() else torch.device("cp
 
 class Volume(nn.Module):
   def __init__(self, beam_xy: Tensor, pressure: float, collimator_length: Union[Tensor, float], budget: Optional[float] = None, device: torch.device = DEVICE):
-    r"""
-    Initializes the volume with a certain beam position, pressure, and collimators length
+  r"""
+   Initializes the volume with a certain beam position, pressure, and collimators length
 
     Arguments:
         beam_position: the tensor of the (x,y) position of the beam
