@@ -14,14 +14,14 @@ Provides implementation of wrapper classes for the volume made of passive volume
 __all__ = ["Volume"]
 
 class Volume(nn.Module):
-    def __init__(self, beam_xy: Tensor, pressure: float, collimator_length: Union[Tensor, float], budget: Optional[float] = None, span_xy: Tensor = Tensor([10.,10.]), pressure_range: Tensor = Tensor([10., 50.]), collimator_length_range: Tensor = Tensor([5., 50.]), device: torch.device = DEVICE):
+    def __init__(self, beam_xy: Tensor, pressure: Tensor, collimator_length: Tensor, budget: Optional[float] = None, span_xy: Tensor = Tensor([10.,10.]), pressure_range: Tensor = Tensor([10., 50.]), collimator_length_range: Tensor = Tensor([5., 50.]), device: torch.device = DEVICE):
         r"""
         Initializes the volume with a certain beam position, pressure, and collimators length
     
         Arguments:
             beam_position: the tensor of the (x,y) position of the beam
             pressure: pressure of the gas in the volume
-            collimator_length: length of the collimators. Can be a float (same collimator length on all four sides) or a tensor of size four (each side has one collimator length)
+            collimator_length: length of the collimators. Can be a tensor of size 1 (same collimator length on all four sides) or of size four (each side has one collimator length)
             budget: optional budget of the detector in currency units.
                 Supplying a value for the optional budget, here, will prepare the volume to learn budget assignments to the detectors,
                 and configure the detectors for the budget.
