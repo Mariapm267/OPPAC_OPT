@@ -15,7 +15,7 @@ __all__ = ["AbsDetectorLoss", "BeamPositionLoss"]
 
 class AbsDetectorLoss(nn.Module, metaclass=ABCMeta):
    def __init__(self,
-                use_cost: Optional[bool] = False,
+                use_cost: Optional[bool] = True,
                 target_budget: Optional[float]
                 budget_smoothing: float = 10,
                 cost_coef: Optional[Union[Tensor, float]] = 1,
