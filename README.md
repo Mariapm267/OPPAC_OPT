@@ -1,4 +1,4 @@
 ...
 
 
-... Quote license (cite tomopt, probably inherit license)
+... Quote license (cite tomopt, inherit its license---this is a derivative work)

@@ -1,3 +1,7 @@
+from core import DEVICE
+import torch
+from torch import Tensor
+
 class AlphaBatch:
   def __init__(self, xy_e: Tensor, device: torch.device = DEVICE):
     self.device = device
