@@ -80,7 +80,7 @@ class Volume(nn.Module):
         """
         return self.beam_xy
     
-    def get_cost(self):
+    def get_cost(self) -> Tensor:
         r"""
         This will be a function of the pressure
         """

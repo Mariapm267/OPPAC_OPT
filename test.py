@@ -15,7 +15,7 @@ ctb = v.get_true_beam_position().detach()
 
 assert(torch.all(tb == ctb))
 
-print("PASSED")
+print("\tPASSED")
 
 print("Test: volume (clamping needed)")
 v = Volume(torch.tensor([-256., 9.8]), pressure=torch.tensor([71.]), collimator_length=torch.tensor([134.]))
@@ -26,4 +26,7 @@ ctb = v.get_true_beam_position().detach()
 
 assert(torch.all(tb == ctb))
 
-print("PASSED")
+print("\tPASSED")
+
+
+
