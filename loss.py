@@ -3,6 +3,14 @@ from torch.nn import functional as F
 from volume import Volume
 from typing import Callable, Dict, Optional, Union
 
+
+
+r"""
+Provides loss functions for evaluating the performance of detector and inference configurations
+"""
+
+__all__ = ["AbsDetectorLoss", "BeamPositionLoss"]
+
 class AbsDetectorLoss(nn.Module, metaclass=ABCMeta):
    def __init__(self,
                 use_cost: Optional[bool] = False,
@@ -90,7 +98,7 @@ class AbsDetectorLoss(nn.Module, metaclass=ABCMeta):
 
       return cost_loss
    
-class BasicLoss(AbsDetectorLoss):
+class BeamPositionLoss(AbsDetectorLoss):
    def _get_inference_loss(self, pred: Tensor, volume: Volume) -> Tensor: # to be adapted
-      true_position = volume.get_true_position()
-      return F.mse_loss(pred, true_position, reduction="mean")
+      true_beam_position = volume.get_true_beam_position()
+      return F.mse_loss(pred, true_beamposition, reduction="mean")
