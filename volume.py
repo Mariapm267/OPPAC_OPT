@@ -15,7 +15,7 @@ __all__ = ["Volume"]
 DEVICE = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu") # Check if TomOpt bug #53 affects us
 
 class Volume(nn.Module):
-  def __init__(self, beam_position: Tensor, pressure: float, collimator_length: Union[Tensor, float], budget: Optional[float] = None, device: torch.device = DEVICE):
+  def __init__(self, beam_xy: Tensor, pressure: float, collimator_length: Union[Tensor, float], budget: Optional[float] = None, device: torch.device = DEVICE):
     r"""
     Initializes the volume with a certain beam position, pressure, and collimators length
 
@@ -29,7 +29,7 @@ class Volume(nn.Module):
     """
 
     super().__init__()
-    self.beam_position = beam_position
+    self.beam_xy = beam_xy
     self._device = device
     self.pressure = pressure
     self.collimator_length = collimator_length
@@ -61,7 +61,7 @@ class Volume(nn.Module):
     Returns:
         Tensor of (x,y) position of the beam
     """
-    return self.beam_position
+    return self.beam_xy
   
   def get_cost(self):
     pass
