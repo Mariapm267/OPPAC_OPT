@@ -79,6 +79,18 @@ class Volume(nn.Module):
             Tensor of (x,y) position of the beam
         """
         return self.beam_xy
+
+    def get_pressure(self) -> Tensor:
+        r"""
+        Returns the current pressure
+        """
+        return self.pressure
+
+    def get_collimator_length(self) -> Tensor:
+        r"""
+        Returns the current collimator length
+        """
+        return self.collimator_length
     
     def get_cost(self) -> Tensor:
         r"""
