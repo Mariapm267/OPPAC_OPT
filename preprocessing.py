@@ -49,11 +49,11 @@ def get_data_from_files(directory, output_file, n_steps = 1):
         '''
         Input: distance array (mu or sigma) in SiPM dimensions  (from 0 to 33)
         
-        Output:  array in distance dimensions ( from -10000 to 10000)
+        Output:  array in distance dimensions ( from -5000 to 5000)
         '''
         interp_values = []
         for value in values:
-            interp_values.append(np.interp(value, (0, 33), (-10000, 10000)))
+            interp_values.append(np.interp(value, (0, 33), (-5000, 5000)))
         return interp_values
 
     def get_array_stats(array):    # por cada array de SiPMs, obtiene N, mu, sigma
@@ -62,8 +62,8 @@ def get_data_from_files(directory, output_file, n_steps = 1):
         
         Outputs:
             - N: total number of photons
-            - mu: mean possition () from a gaussian fit [ in range (-10000, 10000)]
-            - sigma: uncertainty from a gaussian fit [ in range (-10000, 10000)]
+            - mu: mean possition () from a gaussian fit [ in range (-5000, 5000)]
+            - sigma: uncertainty from a gaussian fit [ in range (-5000, 5000)]
         '''
         N = sum(array)                      
         L = np.arange(1,34)                          # enumerate  33 SiPM from 1 to 33
