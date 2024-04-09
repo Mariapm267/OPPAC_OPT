@@ -1,9 +1,9 @@
 import numpy as np
-import pandas as pd
-#from scipy.optimize import curve_fit
 import os
 import pickle
-import tqdm
+from tqdm import tqdm
+import pandas as pd
+import torch
 
 def get_data_from_files(directory, output_file, n_steps = 1):
     if n_steps not in [1, 2]:
@@ -28,8 +28,8 @@ def get_data_from_files(directory, output_file, n_steps = 1):
         '''
         return [np.interp(value, (0, 33), (-5000, 5000)) for value in array]
 
-    def gaussian(x, mu, sigma, A):
-            return A * np.exp(-0.5 * ((x - mu) / sigma)**2)
+    #def gaussian(x, mu, sigma, A):
+    #        return A * np.exp(-0.5 * ((x - mu) / sigma)**2)
         
     def get_array_stats(array):   
         '''
@@ -55,6 +55,9 @@ def get_data_from_files(directory, output_file, n_steps = 1):
             std = np.sqrt(np.sum(array * ((midbins - mean) ** 2)) / N) 
             if std == 0:
                 std =  (10000/33)/np.sqrt(12)    # if std = 0, we assign the minimum sigma for our setting, which is the length of the PM /sqrt(12)
+            
+        
+            # with gaussian fit, much slower 
             #with warnings.catch_warnings():
             #    warnings.simplefilter("error", OptimizeWarning) 
             #    try: 
@@ -108,13 +111,12 @@ def get_data_from_files(directory, output_file, n_steps = 1):
                         targets.append(weighted_mean(output_array))
         return targets
 
-
     with tqdm(total=len(os.listdir(directory))) as pbar:
         targets_total = []
         inputs_total = []
         for file in os.listdir(directory):
             path = os.path.join(directory, file)
-            input = get_inputs(path)
+            input = get_inputs(file)
             targets = get_target(path,n_steps)
             for i in range(len(targets)):
                 inputs_total.append(input)
@@ -137,3 +139,7 @@ def get_data_from_files(directory, output_file, n_steps = 1):
     with open(output_file, 'wb') as file:
         pickle.dump(data, file)
     
+
+
+
+        
