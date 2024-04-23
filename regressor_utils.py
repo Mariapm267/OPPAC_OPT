@@ -47,31 +47,40 @@ class EarlyStopper:
                 return True
         return False
     
-def get_dataloaders(file):
-    full_dataset = AlphasDataset(file)
-    # split into train, validation and test:
-    train_size = 0.7
-    val_size = 0.1
-    test_size = 0.1
-    ht_size = 0.1
+def get_dataloader(file, batch_size = 100):
+    dataset    = AlphasDataset(file)
+    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+    return dataloader
     
-    torch.manual_seed(42)   
-    
-    train_dataset, val_dataset, test_dataset, ht_dataset = torch.utils.data.random_split(full_dataset, [train_size, val_size, test_size, ht_size])
-    ht_train, ht_val = torch.utils.data.random_split(ht_dataset, [0.5,0.5])
-    batch_size = 50  
 
-    train_loader      = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    val_loader        = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
-    test_loader       = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
-    ht_train_loader   = DataLoader(ht_train, batch_size=batch_size, shuffle=True)
-    ht_val_loader   = DataLoader(ht_val, batch_size=batch_size, shuffle=False)
-    return train_loader, val_loader, test_loader, ht_train_loader, ht_val_loader
+def split_data(file):
+    data = pd.read_pickle(file)
+    data = pd.DataFrame(data)
+    stratify_vars = ['dcol', 'p', 'x', 'y']
+    X_train_full, X_remain, y_train_full, y_remain = train_test_split(data.drop(columns=['x_hat', 'y_hat']), data[['x_hat', 'y_hat']], test_size=0.95, stratify=data[stratify_vars], random_state=42)
+    X_tuning, X_train, y_tuning, y_train = train_test_split(X_train_full, y_train_full, test_size=0.95, stratify=X_train_full[stratify_vars], random_state=42)
+    X_tuning_train, X_tuning_val, y_tuning_train, y_tuning_val = train_test_split(X_tuning, y_tuning, test_size=0.50, stratify=X_tuning[stratify_vars], random_state=42)
+    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.50, stratify=X_train[stratify_vars], random_state=42)
+    	
+    data_remaining = pd.concat([X_remain, y_remain], axis=1)
+    data_tuning_val = pd.concat([X_tuning_val, y_tuning_val], axis=1)
+    data_tuning_train = pd.concat([X_tuning_train, y_tuning_train], axis=1)
+    data_val = pd.concat([X_val, y_val], axis=1)
+    data_train = pd.concat([X_train, y_train], axis=1)
     
-    
-    
-def split_dataset(full_dataset, train_size, test_size):
-    ht_size = 1 - train_size - test_size
-    torch.manual_seed(42) 
-    train_dataset, test_dataset, ht_dataset = torch.utils.data.random_split(full_dataset, [train_size, test_size, ht_size])
-    return train_dataset, test_dataset, ht_dataset
+    list_data = [
+    ('data_remaining', data_remaining),
+    ('data_train', data_train),
+    ('data_tuning_train', data_tuning_train),
+    ('data_val', data_val),
+    ('data_train', data_train),
+    ('data_tuning_val', data_tuning_val)
+    ]
+
+    for name, data in list_data:
+        data.reset_index(drop=True, inplace=True)
+        with open(f'../processed_datasets/{name}.pickle', 'wb') as f:
+            pickle.dump(data.to_dict(), f)
+
+          
+    return None
