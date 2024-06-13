@@ -2,17 +2,18 @@ import torch.nn as nn
 import numpy as np
 import torch
 from tqdm import tqdm
-
+import regressor_utils
 
 class NeuralNetwork(nn.Module):
-    def __init__(self, nlayers, hidden_size, dropout, input_size, output_size):
+    def __init__(self, nlayers, hidden_size, dropout, input_size, output_size, act_fun, use_batch_norm):
         super().__init__()
-        layers = []
+        layers = []    
         for i in range(nlayers - 1):
             layers.append(nn.Linear(input_size if i == 0 else hidden_size, hidden_size))
-            #layers.append(nn.BatchNorm1d(hidden_size))  # batch normalization
-            layers.append(nn.ReLU())
-            layers.append(nn.Dropout(p=dropout))  # dropout
+            if use_batch_norm == True:
+                layers.append(nn.BatchNorm1d(hidden_size))  
+            layers.append(act_fun())
+            layers.append(nn.Dropout(p=dropout))  
             
             
         layers.append(nn.Linear(hidden_size, output_size))
@@ -21,7 +22,6 @@ class NeuralNetwork(nn.Module):
     def forward(self, x):
         x = self.linear_relu_stack(x)
         return x
-
 
 
 
@@ -76,6 +76,29 @@ def validation_loop(dataloader, model, loss_fn, use_tqdm=False):
         pbar.close()
         
     return np.mean(losses)
+
+
+
+    
+def fit(train_loader, val_loader, model, epochs, loss_fn, optimizer, scheduler, use_tqdm=False):
+    train_losses=[]
+    val_losses=[]
+
+    early_stopper = regressor_utils.EarlyStopper(patience = 10, min_delta=0.1)
+    
+    for t in range(epochs):
+        print(f"Epoch {t+1}\n-------------------------------")
+        train_loss = train_loop(train_loader, model, loss_fn, optimizer, scheduler, use_tqdm)
+        val_loss  = validation_loop(val_loader, model, loss_fn, use_tqdm)
+        train_losses.append(train_loss)
+        val_losses.append(val_loss)
+        print("Avg train loss", train_loss, ", Avg val loss", val_loss, "Current learning rate", scheduler.get_last_lr(), "\n")
+        if early_stopper.early_stop(val_loss): 
+            print(f"Early stopping on epoch {t}")
+            break
+        
+    print("Done!")
+    return train_losses, val_losses
 
 
 
