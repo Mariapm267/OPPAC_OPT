@@ -6,7 +6,6 @@ from torch import nn, Tensor
 from alpha_batch import AlphaBatch
 
 
-
 r"""
 Provides implementation of wrapper classes for the volume made of passive volume and optimizable detector.
 """
@@ -14,12 +13,11 @@ Provides implementation of wrapper classes for the volume made of passive volume
 __all__ = ["Volume"]
 
 class Volume(nn.Module):
-    def __init__(self, beam_xy: Tensor, pressure: Tensor, collimator_length: Tensor, budget: Optional[float] = None, span_xy: Tensor = Tensor([10.,10.]), pressure_range: Tensor = Tensor([10., 50.]), collimator_length_range: Tensor = Tensor([5., 50.]), device: torch.device = DEVICE):
+    def __init__(self, pressure: Tensor, collimator_length: Tensor, alpha_batch: Tensor, budget: Optional[float] = None, pressure_range: Tensor = Tensor([10., 50.]), collimator_length_range: Tensor = Tensor([5., 50.]), device: torch.device = DEVICE):
         r"""
         Initializes the volume with a certain beam position, pressure, and collimators length
     
         Arguments:
-            beam_position: the tensor of the (x,y) position of the beam
             pressure: pressure of the gas in the volume
             collimator_length: length of the collimators. Can be a tensor of size 1 (same collimator length on all four sides) or of size four (each side has one collimator length)
             budget: optional budget of the detector in currency units.
@@ -30,12 +28,11 @@ class Volume(nn.Module):
         """
     
         super().__init__()
-        self.beam_xy = beam_xy
+        self.alpha_batch = alpha_batch
         self._device = device
         self.pressure = pressure
         self.collimator_length = collimator_length
         self.budget = None if budget is None else torch.tensor(budget, device=self.device)
-        self.span_xy = span_xy
         self.pressure_range = pressure_range
         self.collimator_length_range = collimator_length_range
   
@@ -48,12 +45,6 @@ class Volume(nn.Module):
         """
         pass
   
-    def draw(self) -> None:
-        r"""
-            Draws the layers/panels pertaining to the volume.
-            When using this in a jupyter notebook, use "%matplotlib notebook" to have an interactive plot that you can rotate.
-        """
-        pass
 
     def clamp_parameters(self) -> None:
         r"""
@@ -63,8 +54,6 @@ class Volume(nn.Module):
         AFTER EACH PARAMETERS UPDATE
         """
         with torch.no_grad():
-            self.beam_xy[0].clamp_(min=0., max=self.span_xy[0])
-            self.beam_xy[1].clamp_(min=0., max=self.span_xy[1])
             self.pressure.clamp_(min=self.pressure_range[0], max=self.pressure_range[1])
             self.collimator_length.clamp_(min=self.collimator_length_range[0], max=self.collimator_length_range[1])
     
@@ -92,8 +81,4 @@ class Volume(nn.Module):
         """
         return self.collimator_length
     
-    def get_cost(self) -> Tensor:
-        r"""
-        This will be a function of the pressure
-        """
-        pass
+
