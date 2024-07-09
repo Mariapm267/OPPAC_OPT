@@ -15,38 +15,8 @@ sys.path.append('../')
 import regressor_utils   
 import regressor
 
-#########################################################################################
 
-
-folder = '../../processed_datasets'
-train_loader = regressor_utils.get_dataloader(file = f'{folder}/data_train.pickle')
-val_loader = regressor_utils.get_dataloader(file = f'{folder}/data_val.pickle')
-test_loader = regressor_utils.get_dataloader(file = f'{folder}/data_remaining.pickle')
-
-
-lr = 0.03520592774471439
-n_layers = 3
-hidden_size = 64
-gamma_scheduler = 0.939346938928145
-step_size_scheduler = 3
-do = 0
-activation_fun = nn.SELU
-batch_norm = False
-
-model = regressor.NeuralNetwork(nlayers=n_layers, hidden_size=hidden_size, dropout = do, input_size = 4, output_size = 2, act_fun = activation_fun, use_batch_norm=batch_norm)
-criterion = nn.MSELoss()
-optimizer = torch.optim.Adamax(model.parameters(), lr=lr)
-scheduler = torch.optim.lr_scheduler.StepLR(optimizer, gamma=gamma_scheduler, step_size=step_size_scheduler) 
-epochs = 100
-loss_fn = nn.MSELoss()
-
-train_losses, val_losses = regressor.fit(train_loader, val_loader, model, epochs, loss_fn, optimizer, scheduler, use_tqdm=True)
-
-PATH = '../models/Model2.pt'     # model after second optuna
-torch.save(model, PATH)
-
-
-def get_pos(model, test_loader):
+def evaluate_model(model, test_loader):
     pred_pos = []
     true_pos = []
     reco_pos = []
@@ -66,30 +36,72 @@ def get_pos(model, test_loader):
     print(f'RMSE for y: {rmse_y/1000} cm')
     return true_pos, pred_pos, reco_pos
 
-def save_results(true_pos, pred_pos, reco_pos, loss_train, loss_val,  filename = '../../test_results.pickle'):
+
+def save_loss(loss_train, loss_val, filename = '../../loss.pickle'):
+    df2 = pd.DataFrame({
+        'loss_train': loss_train,
+        'loss_val': loss_val
+    })
+    with open('loss_3_prime.pickle', 'wb') as f:
+        pickle.dump(df2, f)
+
+    
+    
+def save_results(true_pos, pred_pos, reco_pos,  filename = '../../pos_results.pickle'):
     df = pd.DataFrame({
         'true_pos': true_pos,
         'pred_pos': pred_pos,
         'reco_pos': reco_pos
     })
     
-    df2 = pd.DataFrame({
-        'loss_train': loss_train,
-        'loss_val': loss_val
-    })
-    
     with open(filename, 'wb') as f:
         pickle.dump(df, f)
         
-    with open('loss_3_prime.pickle', 'wb') as f:
-        pickle.dump(df2, f)
-
-    return None
 
 
+def main():
+    folder = '../../processed_datasets'
+    train_loader = regressor_utils.get_dataloader(file=f'{folder}/data_train.pickle')
+    val_loader = regressor_utils.get_dataloader(file=f'{folder}/data_val.pickle')
 
-print('Evaluate on test set...')
-true_pos, pred_pos, reco_pos = get_pos(model, test_loader)
+    eval_mode = string(input('Do you want to evaluate the model on the test set? (yes or no)'))
+    if eval_mode == 'yes':
+        test_loader = regressor_utils.get_dataloader(file=f'{folder}/data_remaining.pickle')
 
-print('Saving results...')
-save_results(true_pos, pred_pos, reco_pos, train_losses, val_losses, filename = 'test_results_3_prime.pickle')
+    lr = 0.0352
+    n_layers = 3
+    hidden_size = 64
+    gamma_scheduler = 0.9
+    step_size_scheduler = 3
+    do = 0
+    activation_fun = nn.ELU
+    batch_norm = False
+
+    model = regressor.NeuralNetwork(
+        nlayers=n_layers, hidden_size=hidden_size, dropout=do,
+        input_size=4, output_size=2, act_fun=activation_fun,
+        use_batch_norm=batch_norm
+    )
+
+    criterion = nn.MSELoss()
+    optimizer = torch.optim.Adamax(model.parameters(), lr=lr)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, gamma=gamma_scheduler, step_size=step_size_scheduler)
+    epochs = 100
+    loss_fn = nn.MSELoss()
+
+    train_losses, val_losses = regressor.fit(train_loader, val_loader, model, epochs, loss_fn, optimizer, scheduler, use_tqdm=True)
+
+    PATH = '../models/Model2.pt'
+    torch.save(model, PATH)
+
+    print('Saving loss...')
+    save_loss(train_losses, val_losses, filename='../../loss_model2.pickle')
+
+    if eval_mode:
+        print('Evaluate on test set...')
+        true_pos, pred_pos, reco_pos = evaluate_model(model, test_loader)
+        print('Saving results...')
+        save_results(true_pos, pred_pos, reco_pos, filename='pos_results_2.pickle')
+
+if __name__ == "__main__":
+    main()
