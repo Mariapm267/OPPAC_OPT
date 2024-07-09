@@ -16,6 +16,12 @@ import regressor_utils
 import regressor
 
 
+def load_best_params(filename='best_params.pickle'):
+    with open(filename, 'rb') as f:
+        best_params = pickle.load(f)
+    return best_params
+
+
 def evaluate_model(model, test_loader):
     pred_pos = []
     true_pos = []
@@ -68,14 +74,16 @@ def main():
     if eval_mode == 'yes':
         test_loader = regressor_utils.get_dataloader(file=f'{folder}/data_remaining.pickle')
 
+    best_params = load_best_params()
+
     lr = 0.0352
     n_layers = 3
     hidden_size = 64
-    gamma_scheduler = 0.9
-    step_size_scheduler = 3
-    do = 0
-    activation_fun = nn.ELU
-    batch_norm = False
+    gamma_scheduler = best_params['gamma_scheduler']
+    step_size_scheduler = best_params['step_size_scheduler']
+    do =  best_params['do']
+    activation_fun =  best_params['activation_fun']
+    batch_norm =best_params['use_batch_norm']
 
     model = regressor.NeuralNetwork(
         nlayers=n_layers, hidden_size=hidden_size, dropout=do,
