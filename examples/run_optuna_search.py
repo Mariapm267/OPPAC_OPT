@@ -54,27 +54,24 @@ def print_hyperparameters_and_best(study, trial):
     print(f"Mejor valor hasta ahora: {best_trial.value}")
     print(f"Parámetros del mejor trial hasta ahora: {best_trial.params}")
 
+def save_best_params(study, filename='best_params.pickle'):
+    with open(filename, 'wb') as f:
+        pickle.dump(study.best_params, f)
 
 def main(n_trials):
     sampler = optuna.samplers.TPESampler(seed=42)
     study = optuna.create_study(sampler=sampler, direction='minimize')
     study.optimize(objective, n_trials=n_trials, n_jobs = 8, callbacks=[print_hyperparameters_and_best])
-
+    
     print("Best trial:")
     best_trial = study.best_trial
 
     print("  Value: ", best_trial.value)
     
-    with open('optuna_log_2.txt', 'w') as f:
-        f.write('Best trial:\n')
-        f.write(f'N trials: {n_trials}\n')
-        f.write(f'  Value: {best_trial.value}\n')
-        f.write('  Params:\n')
-        for key, value in best_trial.params.items():
-            f.write(f'    {key}: {value}\n')
+    save_best_params(study)
     
     
+n_trials = 1000  
+if __name__ == "__main__":
     
-    
-n_trials = 1000
-main(n_trials)
+    main(n_trials)
