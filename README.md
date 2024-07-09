@@ -13,7 +13,7 @@ HOW DOES IT WORK:
  -   Once we have a file: preprocessed_datasets.pickle, examples/run_split_data.py will split data into hyperparameter tuning datasets, training datasets and an evaluation dataset.
  -   Then, the hyperparameter tuning  of the NN can be done with examples/run_optuna.py
  -   The NN can be trained and evaluated with examples/run_nn.py, the model is saved as a .pt
- -   Then, the optimization loop can be done using examples/run_opt.py by specifying the model, the number of alphas and the number of iterations.
+ -   Then, the optimization loop can be done using examples/run_opt.py by specifying the model and the number of alphas in the Alpha Batch.
    
 
 References: 
