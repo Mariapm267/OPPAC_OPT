@@ -9,6 +9,10 @@ import sys
 sys.path.append('../')
 from preprocessing import get_data_from_files
 
-directory = '/scratch04/maria.pereira/TFM/Datasets'
-output_file = '../../processed_datasets/processed_data.pickle'
-get_data_from_files(directory, output_file, n_steps = 1)
+directory = '../../Datasets'
+output_folder = '../../processed_datasets/'
+
+if not os.path.exists(output_folder):
+		os.makedirs(output_folder)
+
+get_data_from_files(directory, output_folder + 'processed_data.pickle', n_steps = 1)
