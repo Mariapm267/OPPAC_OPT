@@ -1,13 +1,17 @@
 from core import DEVICE
 import torch
 from torch import Tensor
+import passive_generator 
+
 
 class AlphaBatch:
-    def __init__(self, xy_e: Tensor, device: torch.device = torch.device('cpu')):
+    def __init__(self, batch_size: int, generator = passive_generator.RandomBeamPositionGenerator() ,device: torch.device = DEVICE):
         self.device = device
-        self._alphas = xy_e.to(self.device)
-        self.beam_xy = xy_e
-
+        self.batch_size = batch_size
+        self.beam_xy = generator.generate_set(batch_size)
+        self._alphas = self.beam_xy.to(device)
+        print(f'Using {self.device}')
+        
         def __repr__(self) -> str:
             return f"Batch of {len(self)} alphas"
 
@@ -19,4 +23,4 @@ class AlphaBatch:
       
     def get_photon_distribution(self) -> Tensor:
       '''Not implemented for now, as the reconstruction process is made separately'''
-      pass
+      return NotImplementedError

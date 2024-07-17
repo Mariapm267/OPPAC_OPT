@@ -6,7 +6,6 @@ import os
 
 # From repo
 sys.path.append('../')
-import passive_generator 
 import optimization
 from core import DEVICE
 from alpha_batch import AlphaBatch
@@ -16,10 +15,9 @@ model_path = '../models/Model2.pt'
 model= torch.load(model_path)                  
 model.eval()
 
-# use generator to generate a batch of beam possitions
-batch_size = 10000
-generator = passive_generator.RandomBeamPositionGenerator()
-alpha_batch = AlphaBatch(generator.generate_set(batch_size))
+# generate an alpha batch
+batch_size = 100000
+alpha_batch = AlphaBatch(batch_size=batch_size)
 
 # fit
 pressure = torch.tensor(random.uniform(10,50), dtype=torch.float32)
@@ -31,7 +29,7 @@ loss_values, p_values, d_values = VolumeWrapper.fit()
 
 plot = True
 if plot:
-    figs_folder = '../../figs/'
+    figs_folder = '../figs/'
     if not os.path.exists(figs_folder):
       os.makedirs(figs_folder)
       VolumeWrapper.plot_loss(loss_values)
