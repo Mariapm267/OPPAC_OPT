@@ -2,7 +2,7 @@ import torch
 import sys
 import random
 import matplotlib.pyplot as plt
-
+import os
 
 # From repo
 sys.path.append('../')
@@ -33,7 +33,7 @@ plot = True
 if plot:
     figs_folder = '../../figs/'
     if not os.path.exists(figs_folder):
-		os.makedirs(figs_folder)
-    VolumeWrapper.plot_loss(loss_values)
-    VolumeWrapper.plot_pressure(p_values)
-    VolumeWrapper.plot_col_lenght(d_values)
+      os.makedirs(figs_folder)
+      VolumeWrapper.plot_loss(loss_values)
+      VolumeWrapper.plot_pressure(p_values)
+      VolumeWrapper.plot_col_lenght(d_values)
