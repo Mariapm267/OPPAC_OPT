@@ -16,7 +16,7 @@ model= torch.load(model_path)
 model.eval()
 
 # generate an alpha batch
-batch_size = 100000
+batch_size = 10000
 alpha_batch = AlphaBatch(batch_size=batch_size)
 
 # fit
@@ -32,6 +32,6 @@ if plot:
     figs_folder = '../figs/'
     if not os.path.exists(figs_folder):
       os.makedirs(figs_folder)
-      VolumeWrapper.plot_loss(loss_values)
-      VolumeWrapper.plot_pressure(p_values)
-      VolumeWrapper.plot_col_lenght(d_values)
+    VolumeWrapper.plot_loss(loss_values, path = '../figs/loss_opt.pdf')
+    VolumeWrapper.plot_pressure(p_values, path = '../figs/pressure_opt.pdf')
+    VolumeWrapper.plot_col_length(d_values, path = '../figs/length_opt.pdf')

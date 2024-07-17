@@ -87,29 +87,28 @@ class AbsVolumeWrapper(Volume):
         print(f'Best parameters are...\nPressure: {self.pressure.detach()} Torr\nCollimator length: {self.collimator_length.detach()} mm')
         return loss_values, p_values, d_values
 
-    def plot_loss(self, loss_values, path = '../figs/loss_curve_OPT.pdf', fontsize = 14):
+    def plot_loss(self, loss_values, path, fontsize = 14):
         plt.figure()
         plt.plot(range(self.epochs), np.sqrt(loss_values) / 1000, label='Loss')
         plt.xlabel('Epoch', fontsize = fontsize)
         plt.ylabel('Loss [cm]', fontsize = fontsize)
         plt.title('Optimisation Loss Function', fontsize = fontsize)
-        plt.legend()
         plt.savefig(path, dpi=400)
 
-    def plot_pressure(self, p_values, path = '../figs/pressure_curve_OPT.pdf', additional_text = None):
+    def plot_pressure(self, p_values, path, fontsize = 14):
         plt.figure()
         plt.plot(range(len(p_values)), p_values)
-        plt.xlabel('Epoch')
-        plt.ylabel('p [Torr]')
-        plt.title(f'Evolution of pressure {additional_text}')
+        plt.xlabel('Epoch', fontsize = fontsize)
+        plt.ylabel('p [Torr]', fontsize = fontsize)
+        plt.title(f'Evolution of pressure', fontsize = fontsize)
         plt.savefig(path, dpi=400)
 
-    def plot_col_length(self, d_values , path = '../figs/length_curve_OPT.pdf', fontsize = 14):
+    def plot_col_length(self, d_values, path, fontsize = 14):
         plt.figure()
         plt.plot(range(len(d_values)), d_values)
-        plt.xlabel('Epoch')
-        plt.ylabel('d [mm]')
-        plt.title('Evolution of collimator length')
+        plt.xlabel('Epoch', fontsize = fontsize)
+        plt.ylabel('d [mm]', fontsize = fontsize)
+        plt.title('Evolution of collimator length', fontsize = fontsize)
         plt.savefig(path, dpi=400)
 
     
