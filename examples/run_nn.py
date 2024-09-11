@@ -17,6 +17,9 @@ import regressor
 
 
 def load_best_params(filename='best_params.pickle'):
+    '''
+    Loads the hyperparameters obtained with optuna
+    '''
     with open(filename, 'rb') as f:
         best_params = pickle.load(f)
     return best_params
@@ -64,14 +67,17 @@ def save_results(true_pos, pred_pos, reco_pos,  filename = '../../pos_results.pi
         
 
 def main():
+
+    # Load data
     folder = '../../processed_datasets'
     train_loader = regressor_utils.get_dataloader(file=f'{folder}/data_train.pickle')
     val_loader = regressor_utils.get_dataloader(file=f'{folder}/data_val.pickle')
     
-    eval_mode = string(input('Do you want to evaluate the model on the test set? (yes or no)'))
+    eval_mode = True   # load evaluation dataset or not
     if eval_mode:
         test_loader = regressor_utils.get_dataloader(file=f'{folder}/data_remaining.pickle')
 
+    # Model definition
     best_params = load_best_params()
 
     nsteps = 1
@@ -101,19 +107,22 @@ def main():
     epochs = 100
     loss_fn = nn.MSELoss()
 
+    # Training
     train_losses, val_losses = regressor.fit(train_loader, val_loader, model, epochs, loss_fn, optimizer, scheduler, use_tqdm=True)
 
+
+    # Save model
     PATH = '../models/Model.pt'
     torch.save(model, PATH)
 
     print('Saving loss...')
-    save_loss(train_losses, val_losses, filename='../../loss_model2.pickle')
+    save_loss(train_losses, val_losses, filename='../../loss.pickle')
 
     if eval_mode:
-        print('Evaluate on test set...')
+        print('Evaluating on test set...')
         true_pos, pred_pos, reco_pos = evaluate_model(model, test_loader)
         print('Saving results...')
-        save_results(true_pos, pred_pos, reco_pos, filename='pos_results.pickle')
+        save_results(true_pos, pred_pos, reco_pos, filename='position_results.pickle')
 
 if __name__ == "__main__":
     main()
