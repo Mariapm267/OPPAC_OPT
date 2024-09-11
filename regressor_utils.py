@@ -53,14 +53,27 @@ def get_dataloader(file, batch_size = 100):
     return dataloader
     
 
-def split_data(file):
+def split_data(file, nsteps = 1, seed = 42):
     data = pd.read_pickle(file)
     data = pd.DataFrame(data)
+
+    # Splitting is done mantaining equal quantities of events with each combination of parameters
     stratify_vars = ['dcol', 'p', 'x', 'y']
-    X_train_full, X_remain, y_train_full, y_remain = train_test_split(data.drop(columns=['x_hat', 'y_hat']), data[['x_hat', 'y_hat']], test_size=0.95, stratify=data[stratify_vars], random_state=42)
-    X_tuning, X_train, y_tuning, y_train = train_test_split(X_train_full, y_train_full, test_size=0.95, stratify=X_train_full[stratify_vars], random_state=42)
-    X_tuning_train, X_tuning_val, y_tuning_train, y_tuning_val = train_test_split(X_tuning, y_tuning, test_size=0.50, stratify=X_tuning[stratify_vars], random_state=42)
-    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.50, stratify=X_train[stratify_vars], random_state=42)
+    
+    if nsteps = 1:
+        target = ['dcol', 'p', 'x', 'y']
+    elif nsteps = 2:
+        target = ['Nx1', 'mux1', 'sigmax1', 
+                  'Nx2', 'mux2', 'sigmax2', 
+                  'Ny1', 'muy1', 'sigmay1', 
+                  'Ny2', 'muy2', 'sigmay2']
+    else:
+        raise ValueError('Number of nsteps not valid (1 or 2)')
+
+    X_train_full, X_remain, y_train_full, y_remain = train_test_split(data.drop(columns=target), data[target], test_size=0.95, stratify=data[stratify_vars], random_state=seed)
+    X_tuning, X_train, y_tuning, y_train = train_test_split(X_train_full, y_train_full, test_size=0.95, stratify=X_train_full[stratify_vars], random_state=seed)
+    X_tuning_train, X_tuning_val, y_tuning_train, y_tuning_val = train_test_split(X_tuning, y_tuning, test_size=0.50, stratify=X_tuning[stratify_vars], random_state=seed)
+    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.50, stratify=X_train[stratify_vars], random_state=seed)
     	
     data_remaining = pd.concat([X_remain, y_remain], axis=1)
     data_tuning_val = pd.concat([X_tuning_val, y_tuning_val], axis=1)
