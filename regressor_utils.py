@@ -60,9 +60,9 @@ def split_data(file, nsteps = 1, seed = 42):
     # Splitting is done mantaining equal quantities of events with each combination of parameters
     stratify_vars = ['dcol', 'p', 'x', 'y']
     
-    if nsteps = 1:
+    if nsteps == 1:
         target = ['dcol', 'p', 'x', 'y']
-    elif nsteps = 2:
+    elif nsteps == 2:
         target = ['Nx1', 'mux1', 'sigmax1', 
                   'Nx2', 'mux2', 'sigmax2', 
                   'Ny1', 'muy1', 'sigmay1', 
