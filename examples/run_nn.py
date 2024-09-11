@@ -48,10 +48,9 @@ def save_loss(loss_train, loss_val, filename = '../../loss.pickle'):
         'loss_train': loss_train,
         'loss_val': loss_val
     })
-    with open('loss_3_prime.pickle', 'wb') as f:
+    with open('loss.pickle', 'wb') as f:
         pickle.dump(df2, f)
 
-    
     
 def save_results(true_pos, pred_pos, reco_pos,  filename = '../../pos_results.pickle'):
     df = pd.DataFrame({
@@ -64,18 +63,18 @@ def save_results(true_pos, pred_pos, reco_pos,  filename = '../../pos_results.pi
         pickle.dump(df, f)
         
 
-
 def main():
     folder = '../../processed_datasets'
     train_loader = regressor_utils.get_dataloader(file=f'{folder}/data_train.pickle')
     val_loader = regressor_utils.get_dataloader(file=f'{folder}/data_val.pickle')
-
+    
     eval_mode = string(input('Do you want to evaluate the model on the test set? (yes or no)'))
-    if eval_mode == 'yes':
+    if eval_mode:
         test_loader = regressor_utils.get_dataloader(file=f'{folder}/data_remaining.pickle')
 
     best_params = load_best_params()
 
+    nsteps = 1
     lr = 0.0352
     n_layers = 3
     hidden_size = 64
@@ -85,9 +84,14 @@ def main():
     activation_fun =  best_params['activation_fun']
     batch_norm =best_params['use_batch_norm']
 
+    if nsteps == 1:
+        output_size = 2
+    elif nsteps == 2:
+        output_size = 12
+
     model = regressor.NeuralNetwork(
         nlayers=n_layers, hidden_size=hidden_size, dropout=do,
-        input_size=4, output_size=2, act_fun=activation_fun,
+        input_size=4, output_size=output_size, act_fun=activation_fun,
         use_batch_norm=batch_norm
     )
 
@@ -99,7 +103,7 @@ def main():
 
     train_losses, val_losses = regressor.fit(train_loader, val_loader, model, epochs, loss_fn, optimizer, scheduler, use_tqdm=True)
 
-    PATH = '../models/Model2.pt'
+    PATH = '../models/Model.pt'
     torch.save(model, PATH)
 
     print('Saving loss...')
@@ -109,7 +113,7 @@ def main():
         print('Evaluate on test set...')
         true_pos, pred_pos, reco_pos = evaluate_model(model, test_loader)
         print('Saving results...')
-        save_results(true_pos, pred_pos, reco_pos, filename='pos_results_2.pickle')
+        save_results(true_pos, pred_pos, reco_pos, filename='pos_results.pickle')
 
 if __name__ == "__main__":
     main()
