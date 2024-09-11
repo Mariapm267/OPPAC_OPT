@@ -35,7 +35,7 @@ This is a derivative work from: https://github.com/GilesStrong/tomopt, TomOpt: D
  -   Preprocessing: at this point we have two options:
    
      - From simulated events, reconstruct the position (with this option, the NN will predict the reco position directly).
-     - From simulated events, reconstruct the photon distribution (N, $\mu$, $\sigma$) in each wall.
+     - From simulated events, reconstruct the photon distribution (N, $\mu$, $\sigma$) in each wall. NOT FULLY IMPLEMENTED YET
    
  -   Split data: examples/run_split_data.py will split data into hyperparameter tuning datasets, training datasets and an evaluation dataset.
   
