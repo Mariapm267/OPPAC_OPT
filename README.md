@@ -1,5 +1,5 @@
 
-This repository is focused on the optimization of this detector by using differentiable programming and machine learning techniques.
+This repository is focused on the optimization of a detector (Parallel-Plate Avalanche Counter with Optical Readout) employing differentiable programming and machine learning techniques.
 
 # Detector description:
 
