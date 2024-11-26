@@ -1,18 +1,13 @@
-import numpy as np
-import pandas as pd
-
-#time visualization
-from tqdm import tqdm
-
-#my modules
 import sys
 sys.path.append('../')
 from preprocessing import get_data_from_files
 
-directory = '../../Datasets'
-output_folder = '../../processed_datasets/'
 
-if not os.path.exists(output_folder):
-		os.makedirs(output_folder)
+directory = '/scratch04/maria.pereira/TFM/Datasets/'
+version = '1step'   #'2steps' or '1step'
+output_file = f'../../processed_datasets/processed_data_{version}.pickle'
 
-get_data_from_files(directory, output_folder + 'processed_data.pickle', n_steps = 1)
+get_data_from_files(directory, output_file, n_steps = None, nevents_per_file = 1000, get_only_distributions = True)
+
+
+

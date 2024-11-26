@@ -79,13 +79,11 @@ def validation_loop(dataloader, model, loss_fn, use_tqdm=False):
 
 
 
-    
-def fit(train_loader, val_loader, model, epochs, loss_fn, optimizer, scheduler, use_tqdm=False):
+
+def fit(train_loader, val_loader, model, epochs, loss_fn, optimizer, scheduler, early_stopper = regressor_utils.EarlyStopper(), use_tqdm=False):
     train_losses=[]
     val_losses=[]
-
-    early_stopper = regressor_utils.EarlyStopper(patience = 10, min_delta=0.1)
-    
+      
     for t in range(epochs):
         print(f"Epoch {t+1}\n-------------------------------")
         train_loss = train_loop(train_loader, model, loss_fn, optimizer, scheduler, use_tqdm)
@@ -99,9 +97,3 @@ def fit(train_loader, val_loader, model, epochs, loss_fn, optimizer, scheduler, 
         
     print("Done!")
     return train_losses, val_losses
-
-
-
-
-
-    

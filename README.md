@@ -56,4 +56,3 @@ ArXiv:2309.14027, 2023.
 
 [2] M. Cortesi, Y. Ayyad, and J. Yurkon, “Development of a parallel-plate avalanche
 counter with optical readout (O-PPAC)”, Journal of Instrumentation, vol. 13, no.
-10, pp. P10006-P10006, 2018

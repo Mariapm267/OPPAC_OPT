@@ -19,7 +19,7 @@ class Volume(nn.Module):
     
         Arguments:
             pressure: pressure of the gas in the volume
-            collimator_length: length of the collimators. Can be a tensor of size 1 (same collimator length on all four sides) or of size four (each side has one collimator length)
+            collimator_length: length of the collimators. Tensor of size 1.
             budget: optional budget of the detector in currency units.
                 Supplying a value for the optional budget, here, will prepare the volume to learn budget assignments to the detectors,
                 and configure the detectors for the budget.

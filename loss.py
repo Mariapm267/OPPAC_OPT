@@ -1,14 +1,11 @@
 from abc import ABCMeta, abstractmethod
-
+import torch
 from torch import nn, Tensor
 from torch.nn import functional as F
 from volume import Volume
 from typing import Callable, Dict, Optional, Union
 
-
-""" NOT USED FOR NOW"""
-
-r"""
+"""
 Provides loss functions for evaluating the performance of detector and inference configurations
 """
 
@@ -16,28 +13,27 @@ __all__ = ["AbsDetectorLoss", "BeamPositionLoss"]
 
 class AbsDetectorLoss(nn.Module, metaclass=ABCMeta):
    def __init__(self,
-                use_cost: Optional[bool] = True,
-                target_budget: Optional[float]
-                budget_smoothing: float = 10,
-                cost_coef: Optional[Union[Tensor, float]] = 1,
+                use_cost: Optional[bool] = False,
+                #target_budget: Optional[float],
+                #budget_smoothing: float = 10,
+                #cost_coef: Optional[Union[Tensor, float]] = 1,
                 debug = False):
       super().__init__()
       self.use_cost = use_cost
-      self.target_budget = target_budget
-      self.budget_smoothing: budget_smoothing
-      self.cost_coef = cost_coef
-      self.debug = debug
+      #self.target_budget = target_budget
+      #self.budget_smoothing: budget_smoothing
+      #self.cost_coef = cost_coef
+      #self.debug = debug
 
    @abstractmethod
-   def _get_inference_loss(self, pred: Tensor, volume: Volume) -> Tensor:
+   def _get_inference_loss(self, pred: Tensor, beam: Tensor) -> Tensor:
       r"""
       Inheriting class must override this, in order to actually compute the inference part of the loss function.
       The inference part is the only mandatory portion of the loss.
       """
       pass
 
-
-   def forward(self, pred: Tensor, volume: Volume) -> Tensor:
+   def forward(self, pred: Tensor, beam: Tensor) -> Tensor:
       r"""
       Computes the loss for the volume that is fed to the loss, using the current state of the detector.
 
@@ -47,11 +43,11 @@ class AbsDetectorLoss(nn.Module, metaclass=ABCMeta):
       """
 
       self.sub_losses = {}
-      self.sub_losses["error"] = self._get_inference_loss(pred, volume)
-      self.sub_losses["cost"] = self._get_cost_loss(volume) if self.use_cost else None
+      self.sub_losses["error"] = self._get_inference_loss(pred, beam)
+      self.sub_losses["cost"] = self._get_cost_loss(beam) if self.use_cost else None
       return self.sub_losses["error"] + self.sub_losses["cost"] if self.use_cost else self.sub_losses["error"]
 
-
+   
    def _get_budget_coef(self, cost: Tensor) -> Tensor:
       r"""
       Computes the budget loss term from the current cost of the detectors.
@@ -100,8 +96,9 @@ class AbsDetectorLoss(nn.Module, metaclass=ABCMeta):
          )
 
       return cost_loss
+
    
 class BeamPositionLoss(AbsDetectorLoss):
-   def _get_inference_loss(self, pred: Tensor, volume: Volume) -> Tensor: # to be adapted
-      true_beam_position = volume.get_true_beam_position()
-      return F.mse_loss(pred, true_beamposition, reduction="mean")
+   def _get_inference_loss(self, pred: Tensor, beam: Tensor) -> Tensor: # to be adapted
+      return F.mse_loss(pred, beam, reduction="mean")
+
